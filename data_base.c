@@ -6,7 +6,7 @@
 #define END_NAME "###"
 #define END_SUBJECT -1
 #define FILE_NAME "sxr.bin"
-//1346
+
 typedef enum file_process_mode
 {
 	Write = 1,
