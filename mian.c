@@ -29,9 +29,14 @@ int menu_select(void)
 
 int main(void)
 {
-	Class* test = Class_init();
+	Class* test;
 	Class* temp;
-	//Class_input(test);
+
+	//test = All_class_input();
+	//Output_all_class(test);
+	//Save(test);
+	temp = Load();
+	Output_all_class(temp);
 
 	while (1)
 	{
@@ -62,8 +67,6 @@ int main(void)
 		system("CLS");
 	}
 
-	//Save(test);
-	temp = Load();
-	Output_class(temp);
+
 	return 0;
 }

@@ -1,4 +1,4 @@
-#ifndef DATA_BASE
+﻿#ifndef DATA_BASE
 #define DATA_BASE
 
 #include <stdio.h>
@@ -31,6 +31,14 @@ typedef struct Subject
 	struct Subject* next;
 }Subject;
 
+typedef struct Average
+{
+	int num;
+	float sum;
+	Course course;
+	struct Average* next;
+}Average;
+
 typedef struct Student
 {
 	char name[MAX_NAME_SIZE + 1];
@@ -44,18 +52,35 @@ typedef struct Class
 {
 	Student* student_LL;
 	int stu_num;
-	Student* last;
+	char name[MAX_NAME_SIZE + 1];
+	Average* aver_LL;
+	struct Class* next;
 }Class;
 
+
+
 Class* Class_init(void);
-void Class_input(Class* cla_tem);
-Student* Student_input(void);
+FILE* File_head_process(file_process_mode mode);
+
 Subject* Subject_input(void);
+Student* Student_input(void);
+Class* Class_input(void);
+Class* All_class_input(void);
+
+char* Output_subject(Course temp);
+void Output_student(Student* stu_tem);
+void Output_aver(Average* aver_tem);
+void Output_class(Class* cla_tem);
+void Output_all_class(Class* cla);
+
+Subject* Find_Subject(Subject* sub_LL, Course cour_tem);
+Average* Find_Average(Average* sub_LL, Course cour_tem);
+Average* Average_add_subject(Average* aver_LL, Subject* sub_tem);
+void Average_updata(Class* cla_tem, Student* stu_tem);
+
+
+Subject* Subject_LL_load(FILE* fp);
 void Save(Class* cla_tem);
 Class* Load(void);
-FILE* File_head_process(file_process_mode mode);
-char* Output_subject(Course temp);
-void Subject_LL_load(Student* stu_tem, FILE* fp);
-
 
 #endif
