@@ -73,14 +73,19 @@ void Output_aver(Average* aver_tem);
 void Output_class(Class* cla_tem);
 void Output_all_class(Class* cla);
 
-Subject* Find_Subject(Subject* sub_LL, Course cour_tem);
+Subject** Find_Subject(Subject** sub_LL, Course cour_tem);
 Average* Find_Average(Average* sub_LL, Course cour_tem);
-Average* Average_add_subject(Average* aver_LL, Subject* sub_tem);
-void Average_updata(Class* cla_tem, Student* stu_tem);
+Class* Find_Class(Class* cla_LL, char name[MAX_NAME_SIZE + 1]);
+Student* Find_Student(Student* stu_LL, char name[MAX_NAME_SIZE + 1]);
 
+
+void Average_add_Subject(Average** aver_LL, Subject* sub_tem);
+void Average_add_Student(Average** aver_LL, Student* stu_tem);
+void Average_update_Class(Class* cla_tem);
 
 Subject* Subject_LL_load(FILE* fp);
 void Save(Class* cla_tem);
 Class* Load(void);
+void Change_data(Class* cla_LL);
 
 #endif

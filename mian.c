@@ -37,7 +37,9 @@ int main(void)
 	//Save(test);
 	temp = Load();
 	Output_all_class(temp);
-
+	Change_data(temp);
+	Output_all_class(temp);
+	
 	while (1)
 	{
 		switch (menu_select())

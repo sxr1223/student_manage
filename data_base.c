@@ -32,7 +32,6 @@ FILE* File_head_process(file_process_mode mode)
 }
 
 
-
 char* Output_subject(Course temp)
 {
 	switch (temp)
@@ -111,19 +110,6 @@ void Output_all_class(Class* cla)
 
 
 
-Subject* Find_Subject(Subject* sub_LL, Course cour_tem)
-{
-	if (sub_LL == NULL)
-		return NULL;
-	while (sub_LL != NULL)
-	{
-		if (sub_LL->course == cour_tem)
-			return sub_LL;
-		sub_LL = sub_LL->next;
-	}
-	return NULL;
-}
-
 Average* Find_Average(Average* sub_LL, Course cour_tem)
 {
 	if (sub_LL == NULL)
@@ -137,45 +123,100 @@ Average* Find_Average(Average* sub_LL, Course cour_tem)
 	return NULL;
 }
 
-Average* Average_add_subject(Average* aver_LL, Subject* sub_tem)
+Student* Find_Student(Student* stu_LL, char name[MAX_NAME_SIZE + 1])
 {
-	Average* aver_start = aver_LL;
-
-	if (aver_LL != NULL)
+	while (stu_LL != NULL)
 	{
-		while (aver_LL->next != NULL)
-			aver_LL = aver_LL->next;
-		aver_LL->next = malloc(sizeof(Average));
-		aver_LL = aver_LL->next;
-		aver_LL->next = NULL;
-		aver_LL->num = 1;
-		aver_LL->course = sub_tem->course;
-		aver_LL->sum = sub_tem->score;
+		if (!strcmp(name, stu_LL->name))
+			return stu_LL;
+		stu_LL = stu_LL->next;
+	}
+	return NULL;
+}
 
-		return aver_start;
+Class* Find_Class(Class* cla_LL, char name[MAX_NAME_SIZE + 1])
+{
+	while (cla_LL != NULL)
+	{
+		if (!strcmp(name, cla_LL->name))
+			return cla_LL;
+		cla_LL = cla_LL->next;
+	}
+	return NULL;
+}
+
+Subject** Find_Subject(Subject** sub_LL, Course cour_tem)
+{
+	while (*sub_LL != NULL)
+	{
+		if ((*sub_LL)->course == cour_tem)
+			return sub_LL;
+		sub_LL = &((*sub_LL)->next);
+	}
+	return NULL;
+}
+
+void Del_Subject(Subject** target)
+{
+	Subject* sub_tem = (*target)->next;
+
+	free(*target);
+	*target = sub_tem;
+}
+
+void Modify_Subject(Subject** sub_tem)
+{
+	float score;
+
+	printf("please input new score.\n");
+	scanf("%f", &score);
+	(*sub_tem)->score = score;
+}
+
+void Add_Subject(Subject** sub_tem)
+{
+	Subject* to_add = malloc(sizeof(Subject));
+	to_add->next = (*sub_tem)->next;
+	(*sub_tem)->next = to_add;
+	printf("please input subject code:\n");
+	scanf("%d", &to_add->course);
+	printf("please input score:\n");
+	scanf("%f", &to_add->score);
+}
+
+void Average_add_Subject(Average** aver_LL, Subject* sub_tem)
+{
+	if (*aver_LL != NULL)
+	{
+		while ((*aver_LL)->next != NULL)
+			aver_LL = &((*aver_LL)->next);
+		(*aver_LL)->next = malloc(sizeof(Average));
+		aver_LL = &((*aver_LL)->next);
+		(*aver_LL)->next = NULL;
+		(*aver_LL)->num = 1;
+		(*aver_LL)->course = sub_tem->course;
+		(*aver_LL)->sum = sub_tem->score;
 	}
 	else
 	{
-		aver_LL = malloc(sizeof(Average));
-		aver_LL->next = NULL;
-		aver_LL->num = 1;
-		aver_LL->course = sub_tem->course;
-		aver_LL->sum = sub_tem->score;
-
-		return aver_LL;
+		*aver_LL = malloc(sizeof(Average));
+		(*aver_LL)->next = NULL;
+		(*aver_LL)->num = 1;
+		(*aver_LL)->course = sub_tem->course;
+		(*aver_LL)->sum = sub_tem->score;
 	}
 }
 
-void Average_updata(Class* cla_tem, Student* stu_tem)
+void Average_add_Student(Average** aver_LL, Student* stu_tem)
 {
 	Average* aver_position;
 	Subject* sub_tem = stu_tem->score_LL;
 
 	while (sub_tem != NULL)
 	{
-		aver_position = Find_Average(cla_tem->aver_LL, sub_tem->course);
+		aver_position = Find_Average(*aver_LL, sub_tem->course);
 		if (aver_position == NULL)
-			cla_tem->aver_LL = Average_add_subject(cla_tem->aver_LL, sub_tem);
+			Average_add_Subject(aver_LL, sub_tem);
 		else
 		{
 			aver_position->num++;
@@ -185,6 +226,31 @@ void Average_updata(Class* cla_tem, Student* stu_tem)
 	}
 }
 
+void Del_aver_LL(Average** aver_start)
+{
+	Average* aver_tem1 = *aver_start;
+	Average* aver_tem2;
+
+	*aver_start = NULL;
+	while (aver_tem1 != NULL)
+	{
+		aver_tem2 = aver_tem1->next;
+		free(aver_tem1);
+		aver_tem1 = aver_tem2;
+	}
+}
+
+void Average_update_Class(Class* cla_tem)
+{
+	Student* stu_tem = cla_tem->student_LL;
+
+	Del_aver_LL(&(cla_tem->aver_LL));
+	while (stu_tem != NULL)
+	{
+		Average_add_Student(&(cla_tem->aver_LL), stu_tem);
+		stu_tem = stu_tem->next;
+	}
+}
 
 
 Subject* Subject_input(void)
@@ -256,14 +322,14 @@ Class* Class_input(void)
 	cla_tem->student_LL = stu_tem2 = Student_input();
 	if (stu_tem2 != NULL)
 	{
-		Average_updata(cla_tem, stu_tem2);
+		Average_add_Student(&(cla_tem->aver_LL), stu_tem2);
 		cla_tem->stu_num++;
 		while (1)
 		{
 			stu_tem1 = Student_input();
 			if (stu_tem1 == NULL)
 				break;
-			Average_updata(cla_tem, stu_tem1);
+			Average_add_Student(&(cla_tem->aver_LL), stu_tem1);
 			stu_tem2->next = stu_tem1;
 			stu_tem2 = stu_tem1;
 			cla_tem->stu_num++;
@@ -287,8 +353,6 @@ Class* All_class_input(void)
 
 	return cla_start;
 }
-
-
 
 
 
@@ -420,4 +484,72 @@ Class* Load(void)
 	fclose(fp);
 
 	return cla_LL;
+}
+
+void Change_data(Class* cla_LL)
+{
+	char name[MAX_NAME_SIZE + 1];
+	Student* stu_tem;
+	Subject** sub_tem;
+	Course cour_tem;
+	char operation;
+
+	do
+	{
+		printf("please input operation.\n");
+		printf("'a' for add new subject, 'd' for delete the subject\n");
+		printf("'m' for modify the score, 'c' for cancel\n");
+		printf("'s' for add new student.\n");
+		
+		scanf("%c", &operation);
+		getchar();
+
+
+		printf("please input the class name:\n");
+		scanf("%s", name);
+		if ((cla_LL = Find_Class(cla_LL, name)) == NULL)
+		{
+			printf("error: no such class.\n");
+			break;
+		}
+
+		if (operation != 's')
+		{
+			printf("please input the student name:\n");
+			scanf("%s", name);
+			if ((stu_tem = Find_Student(cla_LL->student_LL, name)) == NULL)
+			{
+				printf("error: no such student.\n");
+				break;
+			}
+
+			if (operation != 'a')
+			{
+				printf("please input the course code:\n");
+				scanf("%d", &cour_tem);
+				if ((sub_tem = Find_Subject(&(stu_tem->score_LL), cour_tem)) == NULL)
+				{
+					printf("error: no such subject.\n");
+					break;
+				}
+			}
+		}
+		switch (operation)
+		{
+			case 'd': Del_Subject(sub_tem);
+				Average_update_Class(cla_LL);
+				break;
+			case 'm': Modify_Subject(sub_tem);
+				Average_update_Class(cla_LL);
+				break;
+			case 'a': Add_Subject(sub_tem);
+				Average_update_Class(cla_LL);
+				break;
+			case 's': stu_tem = cla_LL->student_LL; 
+				cla_LL->student_LL = Student_input();
+				cla_LL->student_LL->next = stu_tem;
+				Average_add_Student(&(cla_LL->aver_LL), cla_LL->student_LL);
+			case 'c':return;
+		}
+	} while (!(operation == 'd' || operation == 'm' || operation == 'c' || operation == 'a'));
 }
