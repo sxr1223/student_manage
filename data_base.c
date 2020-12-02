@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<stdlib.h>
 #include"data_base.h"
 
 
@@ -29,6 +30,8 @@ FILE* File_head_process(file_process_mode mode)
 
 		return fp;
 	}
+
+	return NULL;
 }
 
 
@@ -48,6 +51,9 @@ char* Output_subject(Course temp)
 void Output_student(Student* stu_tem)
 {
 	Subject* sub_tem;
+
+	if (stu_tem == NULL)
+		return;
 
 	printf("********************************************\n");
 	printf("name: %s\n", stu_tem->name);
@@ -101,6 +107,8 @@ void Output_all_class(Class* cla)
 {
 	Class* cla_tem = cla;
 
+	if (cla == NULL)
+		printf("no data.\n");
 	while (cla_tem != NULL)
 	{
 		Output_class(cla_tem);
@@ -123,11 +131,22 @@ Average* Find_Average(Average* sub_LL, Course cour_tem)
 	return NULL;
 }
 
-Student* Find_Student(Student* stu_LL, char name[MAX_NAME_SIZE + 1])
+Student* Find_Student_Name(Student* stu_LL, char name[MAX_NAME_SIZE + 1])
 {
 	while (stu_LL != NULL)
 	{
 		if (!strcmp(name, stu_LL->name))
+			return stu_LL;
+		stu_LL = stu_LL->next;
+	}
+	return NULL;
+}
+
+Student* Find_Student_Number(Student* stu_LL, char name[NUM_SIZE + 1])
+{
+	while (stu_LL != NULL)
+	{
+		if (!strcmp(name, stu_LL->num))
 			return stu_LL;
 		stu_LL = stu_LL->next;
 	}
@@ -287,7 +306,7 @@ Student* Student_input(void)
 	scanf("%s", stu_tem->num);
 
 	printf("please input student score, input -1 as subject to stop\n");
-	stu_tem->score_LL = sub_tem2 = Subject_input(stu_tem);
+	stu_tem->score_LL = sub_tem2 = Subject_input();
 	if (sub_tem2 != NULL)
 	{
 		while (1)
@@ -339,15 +358,25 @@ Class* Class_input(void)
 	return cla_tem;
 }
 
-Class* All_class_input(void)
+Class* All_class_input(Class* cla_LL)
 {
 	Class* cla_start;
 	Class* cla_tem;
-
+	
 	cla_start = cla_tem = Class_input();
-	while (cla_tem != NULL)
+	if (cla_start == NULL)
+	{
+		cla_start = cla_LL;
+		return cla_start;
+	}
+	while (1)
 	{
 		cla_tem->next = Class_input();
+		if (cla_tem->next == NULL)
+		{
+			cla_tem->next = cla_LL;
+			break;
+		}
 		cla_tem = cla_tem->next;
 	}
 
@@ -483,6 +512,7 @@ Class* Load(void)
 
 	fclose(fp);
 
+	printf("Load data from file success\n");
 	return cla_LL;
 }
 
@@ -490,7 +520,7 @@ void Change_data(Class* cla_LL)
 {
 	char name[MAX_NAME_SIZE + 1];
 	Student* stu_tem;
-	Subject** sub_tem;
+	Subject** sub_tem = NULL;
 	Course cour_tem;
 	char operation;
 
@@ -517,7 +547,7 @@ void Change_data(Class* cla_LL)
 		{
 			printf("please input the student name:\n");
 			scanf("%s", name);
-			if ((stu_tem = Find_Student(cla_LL->student_LL, name)) == NULL)
+			if ((stu_tem = Find_Student_Name(cla_LL->student_LL, name)) == NULL)
 			{
 				printf("error: no such student.\n");
 				break;
@@ -552,4 +582,89 @@ void Change_data(Class* cla_LL)
 			case 'c':return;
 		}
 	} while (!(operation == 'd' || operation == 'm' || operation == 'c' || operation == 'a'));
+}
+
+void Find_data(Class* cla_LL)
+{
+	char name_tem[MAX_NAME_SIZE + 1];
+	Class* cla_tem;
+	Student* stu_tem;
+	int flag = 0;
+
+	printf("please input the related information.\n");
+
+	printf("please input the class name, '###' stand for unkonw.\n");
+	scanf("%s", name_tem);
+	if (strcmp(name_tem, END_NAME))
+	{
+		cla_tem = Find_Class(cla_LL, name_tem);
+		flag = 1;
+	}
+
+	printf("please input the student name, '###' stand for unkonw.\n");
+	scanf("%s", name_tem);
+	if (strcmp(name_tem, END_NAME))
+	{
+		if (flag == 1)
+		{
+			stu_tem = Find_Student_Name(cla_tem->student_LL, name_tem);
+			if (stu_tem != NULL)
+			{
+				Output_student(stu_tem);
+				return;
+			}
+			printf("no such student.\n");
+			return;
+		}
+		if (flag == 0)
+		{
+			cla_tem = cla_LL;
+			while (cla_tem != NULL)
+			{
+				stu_tem = Find_Student_Name(cla_tem->student_LL, name_tem);
+				if (stu_tem != NULL)
+				{
+					Output_student(stu_tem);
+					return;
+				}
+				cla_tem = cla_tem->next;
+			}
+			printf("no such student.\n");
+		}
+		return;
+	}
+
+	printf("please input the student number, '###' stand for unkonw.\n");
+	scanf("%s", name_tem);
+	if (strcmp(name_tem, END_NAME))
+	{
+		if (flag == 1)
+		{
+			stu_tem = Find_Student_Number(cla_tem->student_LL, name_tem);
+			if (stu_tem != NULL)
+			{
+				Output_student(stu_tem);
+				return;
+			}
+			printf("no such student.\n");
+			return;
+		}
+		if (flag == 0)
+		{
+			cla_tem = cla_LL;
+			while (cla_tem != NULL)
+			{
+				stu_tem = Find_Student_Number(cla_tem->student_LL, name_tem);
+				if (stu_tem != NULL)
+				{
+					Output_student(stu_tem);
+					return;
+				}
+				cla_tem = cla_tem->next;
+			}
+			printf("no such student.\n");
+		}
+		return;
+	}
+	printf("please input correct information.\n");
 }

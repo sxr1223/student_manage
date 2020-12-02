@@ -65,7 +65,7 @@ FILE* File_head_process(file_process_mode mode);
 Subject* Subject_input(void);
 Student* Student_input(void);
 Class* Class_input(void);
-Class* All_class_input(void);
+Class* All_class_input(Class* cla_LL);
 
 char* Output_subject(Course temp);
 void Output_student(Student* stu_tem);
@@ -76,8 +76,8 @@ void Output_all_class(Class* cla);
 Subject** Find_Subject(Subject** sub_LL, Course cour_tem);
 Average* Find_Average(Average* sub_LL, Course cour_tem);
 Class* Find_Class(Class* cla_LL, char name[MAX_NAME_SIZE + 1]);
-Student* Find_Student(Student* stu_LL, char name[MAX_NAME_SIZE + 1]);
-
+Student* Find_Student_Name(Student* stu_LL, char name[MAX_NAME_SIZE + 1]);
+void Find_data(Class* cla_LL);
 
 void Average_add_Subject(Average** aver_LL, Subject* sub_tem);
 void Average_add_Student(Average** aver_LL, Student* stu_tem);
