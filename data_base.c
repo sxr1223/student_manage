@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include"sha256.h"
 #include"data_base.h"
 
 
@@ -34,7 +35,6 @@ FILE* File_head_process(file_process_mode mode)
 	return NULL;
 }
 
-
 char* Output_subject(Course temp)
 {
 	switch (temp)
@@ -44,7 +44,7 @@ char* Output_subject(Course temp)
 	case english_2: return "english_2";
 	case english_3: return "english_3";
 	case english_4: return "english_4";
-	default: return "error: no this subject code\n";
+	default: return "error: no this subject code.";
 	}
 }
 
@@ -65,7 +65,7 @@ void Output_student(Student* stu_tem)
 		while (sub_tem != NULL)
 		{
 			printf("\tsubject: %s\n", Output_subject(sub_tem->course));
-			printf("\tscore  : %.1f\n", sub_tem->score);
+			printf("\tscore  : %.1f\n\n", sub_tem->score);
 			sub_tem = sub_tem->next;
 		}
 	}
@@ -175,6 +175,8 @@ Subject** Find_Subject(Subject** sub_LL, Course cour_tem)
 	return NULL;
 }
 
+
+
 void Del_Subject(Subject** target)
 {
 	Subject* sub_tem = (*target)->next;
@@ -245,6 +247,20 @@ void Average_add_Student(Average** aver_LL, Student* stu_tem)
 	}
 }
 
+void Average_update_Class(Class* cla_tem)
+{
+	Student* stu_tem = cla_tem->student_LL;
+
+	Del_aver_LL(&(cla_tem->aver_LL));
+	while (stu_tem != NULL)
+	{
+		Average_add_Student(&(cla_tem->aver_LL), stu_tem);
+		stu_tem = stu_tem->next;
+	}
+}
+
+
+
 void Del_aver_LL(Average** aver_start)
 {
 	Average* aver_tem1 = *aver_start;
@@ -259,15 +275,49 @@ void Del_aver_LL(Average** aver_start)
 	}
 }
 
-void Average_update_Class(Class* cla_tem)
+void Del_Subject_LL(Subject** sub_LL)
 {
-	Student* stu_tem = cla_tem->student_LL;
+	Subject* sub_tem1;
+	Subject* sub_tem2;
 
-	Del_aver_LL(&(cla_tem->aver_LL));
-	while (stu_tem != NULL)
+	sub_tem1 = *sub_LL;
+	*sub_LL = NULL;
+	while (sub_tem1 != NULL)
 	{
-		Average_add_Student(&(cla_tem->aver_LL), stu_tem);
-		stu_tem = stu_tem->next;
+		sub_tem2 = sub_tem1->next;
+		free(sub_tem1);
+		sub_tem1 = sub_tem2;
+	}
+}
+
+void Del_Student(Student** stu_tem)
+{
+	Student* stu = *stu_tem;
+
+	*stu_tem = NULL;
+	Del_Subject_LL(stu->score_LL);
+	free(stu);
+}
+
+void Del_Class_LL(Class** cla_start)
+{
+	Class* cla_tem = *cla_start;
+	Student* stu_tem1;
+	Student* stu_tem2;
+
+	*cla_start = NULL;
+	while (cla_tem == NULL)
+	{
+		Del_aver_LL(&(cla_tem->aver_LL));
+		stu_tem1 = cla_tem->student_LL;
+		
+		while (stu_tem1 != NULL)
+		{
+			stu_tem2 = stu_tem1->next;
+			Del_Student(&stu_tem1);
+			stu_tem1 = stu_tem2;
+		}
+		cla_tem = cla_tem->next;
 	}
 }
 
@@ -304,6 +354,7 @@ Student* Student_input(void)
 	}
 	printf("please input number:\n");
 	scanf("%s", stu_tem->num);
+	sha256_calc(stu_tem->num, strlen(stu_tem->num), stu_tem->pwd);
 
 	printf("please input student score, input -1 as subject to stop\n");
 	stu_tem->score_LL = sub_tem2 = Subject_input();
@@ -418,6 +469,7 @@ void Save(Class* cla_tem)
 		cla_tem = cla_tem->next;
 	}
 	fclose(fp);
+	printf("save success.\n");
 }
 
 Subject* Subject_LL_load(FILE* fp)
@@ -512,7 +564,6 @@ Class* Load(void)
 
 	fclose(fp);
 
-	printf("Load data from file success\n");
 	return cla_LL;
 }
 
@@ -667,4 +718,10 @@ void Find_data(Class* cla_LL)
 		return;
 	}
 	printf("please input correct information.\n");
+}
+
+
+void Student_Authority_Output(Student* stu_tem)
+{
+	Output_student(stu_tem);
 }

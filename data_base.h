@@ -44,6 +44,7 @@ typedef struct Student
 	char name[MAX_NAME_SIZE + 1];
 	char num[NUM_SIZE + 1];
 	struct Student* next;
+	char pwd[32];
 	Subject* score_LL;
 	Subject* last;
 }Student;
@@ -87,5 +88,12 @@ Subject* Subject_LL_load(FILE* fp);
 void Save(Class* cla_tem);
 Class* Load(void);
 void Change_data(Class* cla_LL);
+
+void Del_Class_LL(Class** cla_start);
+void Del_Student(Student** stu_tem);
+void Del_Subject_LL(Subject** sub_LL);
+void Del_aver_LL(Average** aver_start);
+
+void Student_Authority_Output(Student* stu_tem);
 
 #endif

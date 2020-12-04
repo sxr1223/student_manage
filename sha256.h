@@ -4,13 +4,6 @@
 #include <stddef.h>
 
 void sha256_calc(char* data, int len, char result[32]);
-
-//example
-	//char test[] = "123456789";
-	//char result[32];
-	//int i;
-	//sha256_calc(test, 9, result);
-	//for (i = 0; i < 32; i++)
-	//	printf("%X", result[i] & 0xff);
+int sha256_confirm(char* data, int len, char sha2[32]);
 
 #endif

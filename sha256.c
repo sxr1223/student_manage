@@ -12,9 +12,10 @@
 	          example usage of the functions.
 *********************************************************************/
 
-#include <stdlib.h>
-#include <memory.h>
-#include "sha256.h"
+#include<stdlib.h>
+#include<string.h>
+#include<memory.h>
+#include"sha256.h"
 
 #define ROTLEFT(a,b) (((a) << (b)) | ((a) >> (32-(b))))
 #define ROTRIGHT(a,b) (((a) >> (b)) | ((a) << (32-(b))))
@@ -42,7 +43,6 @@ static const WORD k[64] =
   0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
   0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
 };
-
 
 typedef struct
 {
@@ -185,4 +185,13 @@ void sha256_calc(char* data, int len, char result[32])
     sha256_init(&ctx);
     sha256_update(&ctx, data, len);
     sha256_final(&ctx, result);
+}
+
+//0 same
+//1 different
+int sha256_confirm(char* data, int len, char sha2[32])
+{
+    char sha1[32];
+    sha256_calc(data, len, sha1);
+    return memcmp(sha1, sha2, 32);
 }
