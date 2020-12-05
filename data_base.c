@@ -18,6 +18,7 @@ Class* Class_init(void)
 FILE* File_head_process(file_process_mode mode)
 {
 	FILE* fp;
+	int* pt;
 
 	if (mode == Write)
 	{
@@ -29,6 +30,25 @@ FILE* File_head_process(file_process_mode mode)
 	{
 		fp = fopen(FILE_NAME, "rb");
 
+		return fp;
+	}
+	if (mode == Read_pwd)
+	{
+		fp = fopen(FILE_NAME, "rb");
+		fseek(fp, 36, SEEK_END);
+		fread(&pt, sizeof(int*), 1, fp);
+		if (pt == NULL)
+		{
+			printf("successful.\n");
+			return fp;
+		}
+		else
+			return NULL;
+	}
+	if (mode == Write_pwd)
+	{
+		fp = fopen(FILE_NAME, "rb");
+		fseek(fp, 0, SEEK_END);
 		return fp;
 	}
 

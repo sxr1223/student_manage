@@ -17,7 +17,9 @@ int menu_select_admin(void)
 	printf("-------------- 4.查找     ---------------\n");
 	printf("-------------- 5.存档     ---------------\n");
 	printf("-------------- 6.读档     ---------------\n");
-	printf("-------------- 7.退出     ---------------\n");
+	printf("-------------- 7.修改密码 ---------------\n");
+	printf("-------------- 8.重置所有学生密码--------\n");
+	printf("-------------- 9.退出     ---------------\n");
 	printf("-----------------------------------------\n");
 	do
 	{
@@ -79,6 +81,11 @@ void admin_surface(Class* cla_LL)
 			printf("Load data from file success\n");
 			break;
 		case 7:
+			Change_pwd(cla_LL);
+			break;
+		case 8:Student_pwd_reset_All(cla_LL);
+			break;
+		case 9:
 			exit(0);
 		}
 		system("pause");
@@ -110,28 +117,13 @@ void student_surface(Class* cla_LL)
 	}
 }
 
-void pwd(Class* cla)
-{
-	Student* stu_tem;
 
-	while (cla != NULL)
-	{
-		stu_tem = cla->student_LL;
-		while (stu_tem != NULL)
-		{
-			sha256_calc(stu_tem->num, strlen(stu_tem->num), stu_tem->pwd);
-			stu_tem = stu_tem->next;
-		}
-		cla = cla->next;
-	}
-}
 
 int main(void)
 {
 	Class* cla_LL = NULL;
 
 	cla_LL = Load();
-	//pwd(cla_LL);
 	printf("welcome to use students manage system.\n");
 	while (user_now == guest)
 	{

@@ -12,7 +12,9 @@
 typedef enum file_process_mode
 {
 	Write = 1,
-	Read
+	Read,
+	Write_pwd,
+	Read_pwd
 }file_process_mode;
 
 typedef enum course
