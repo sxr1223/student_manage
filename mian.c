@@ -26,7 +26,7 @@ int menu_select_admin(void)
 		printf("\nPlease enter your choice:\n");
 		gets(s);
 		c = atoi(s);
-	} while (c < 0 || c>7);
+	} while (c < 0 || c>9);
 
 	return c;
 }
@@ -48,7 +48,7 @@ int menu_select_student(void)
 		printf("\nPlease enter your choice:\n");
 		gets(s);
 		c = atoi(s);
-	} while (c < 0 || c>7);
+	} while (c < 0 || c>4);
 
 	return c;
 }
